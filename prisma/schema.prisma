@@ -1,0 +1,220 @@
+// Duitrack — skema database
+// Konvensi:
+//  - nominal disimpan sebagai BIGINT rupiah penuh (bukan float, bukan sen)
+//  - `occurredOn` bertipe DATE (tanggal lokal), bukan timestamp
+//  - penghapusan transaksi memakai soft delete (deletedAt)
+//  - saldo TIDAK disimpan; selalu dihitung dari transaksi
+//  - nama kolom di DB memakai snake_case (via @map)
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────────────────────
+// AUTH (skema Better Auth + field profil tambahan)
+// ─────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id
+  name          String    @db.VarChar(100)
+  email         String    @unique @db.VarChar(255)
+  emailVerified Boolean   @default(false) @map("email_verified")
+  image         String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // preferensi aplikasi
+  currency    String    @default("IDR") @db.VarChar(3)
+  timezone    String    @default("Asia/Jakarta") @db.VarChar(50)
+  locale      String    @default("id-ID") @db.VarChar(10)
+  theme       String    @default("system") @db.VarChar(10)
+  onboardedAt DateTime? @map("onboarded_at")
+
+  sessions     Session[]
+  accounts     Account[]
+  wallets      Wallet[]
+  categories   Category[]
+  transactions Transaction[]
+  budgets      Budget[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime @map("expires_at")
+  token     String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  userId    String   @map("user_id")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+// Model ini WAJIB bernama `Account` agar `db.account` tersedia untuk
+// adapter Better Auth. Tabel dompet memakai model terpisah (`Wallet`).
+model Account {
+  id                    String    @id
+  accountId             String    @map("account_id")
+  providerId            String    @map("provider_id")
+  userId                String    @map("user_id")
+  accessToken           String?   @map("access_token")
+  refreshToken          String?   @map("refresh_token")
+  idToken               String?   @map("id_token")
+  accessTokenExpiresAt  DateTime? @map("access_token_expires_at")
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at")
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+// ─────────────────────────────────────────────────────────────
+// DOMAIN KEUANGAN
+// ─────────────────────────────────────────────────────────────
+
+enum WalletType {
+  cash
+  bank
+  ewallet
+  credit
+  investment
+}
+
+model Wallet {
+  id             String     @id @default(uuid())
+  userId         String     @map("user_id")
+  name           String     @db.VarChar(80)
+  type           WalletType @default(cash)
+  initialBalance BigInt     @default(0) @map("initial_balance")
+  color          String     @default("#64748B") @db.VarChar(7)
+  icon           String     @default("wallet") @db.VarChar(50)
+  isDefault      Boolean    @default(false) @map("is_default")
+  isArchived     Boolean    @default(false) @map("is_archived")
+  sortOrder      Int        @default(0) @map("sort_order") @db.SmallInt
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions      Transaction[] @relation("WalletTransactions")
+  transfersIn       Transaction[] @relation("TransferTarget")
+
+  @@index([userId])
+  @@map("wallets")
+}
+
+enum CategoryType {
+  income
+  expense
+}
+
+model Category {
+  id         String       @id @default(uuid())
+  userId     String?      @map("user_id") // NULL = kategori sistem (read-only untuk user)
+  parentId   String?      @map("parent_id")
+  name       String       @db.VarChar(80)
+  type       CategoryType
+  icon       String       @default("circle") @db.VarChar(50)
+  color      String       @default("#64748B") @db.VarChar(7)
+  sortOrder  Int          @default(0) @map("sort_order") @db.SmallInt
+  isArchived Boolean      @default(false) @map("is_archived")
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+
+  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent       Category?     @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children     Category[]    @relation("CategoryTree")
+  transactions Transaction[]
+  budgets      Budget[]
+
+  @@index([userId, type])
+  @@index([parentId])
+  @@map("categories")
+}
+
+enum TransactionType {
+  expense
+  income
+  transfer
+}
+
+model Transaction {
+  id               String          @id @default(uuid())
+  userId           String          @map("user_id")
+  walletId         String          @map("wallet_id")
+  categoryId       String?         @map("category_id")
+  type             TransactionType
+  amount           BigInt // selalu positif
+  occurredOn       DateTime        @map("occurred_on") @db.Date
+  description      String          @db.VarChar(255)
+  note             String?
+  transferWalletId String?         @map("transfer_wallet_id")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+  deletedAt        DateTime?       @map("deleted_at")
+
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wallet         Wallet    @relation("WalletTransactions", fields: [walletId], references: [id], onDelete: Restrict)
+  category       Category? @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  transferWallet Wallet?   @relation("TransferTarget", fields: [transferWalletId], references: [id], onDelete: Restrict)
+
+  @@index([userId, occurredOn(sort: Desc)])
+  @@index([userId, categoryId])
+  @@index([userId, type, occurredOn])
+  @@index([walletId])
+  @@map("transactions")
+}
+
+enum BudgetPeriod {
+  daily
+  weekly
+  monthly
+  yearly
+}
+
+model Budget {
+  id             String       @id @default(uuid())
+  userId         String       @map("user_id")
+  categoryId     String?      @map("category_id") // NULL = anggaran total
+  period         BudgetPeriod @default(monthly)
+  amount         BigInt
+  alertThreshold Int          @default(80) @map("alert_threshold") @db.SmallInt
+  startDate      DateTime     @default(now()) @map("start_date") @db.Date
+  endDate        DateTime?    @map("end_date") @db.Date
+  isActive       Boolean      @default(true) @map("is_active")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isActive])
+  @@map("budgets")
+}

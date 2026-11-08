@@ -1,0 +1,235 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:is(.dark *));
+
+/* ─────────────────────────────────────────────────────────────
+   Animasi transisi (pengganti tw-animate-css)
+   Hanya mendefinisikan utilitas yang benar-benar dipakai,
+   dengan atribut data-state dari Radix.
+   ───────────────────────────────────────────────────────────── */
+
+@layer utilities {
+  @keyframes dt-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes dt-fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  @keyframes dt-zoom-in {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.97); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+  @keyframes dt-zoom-out {
+    from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    to { opacity: 0; transform: translate(-50%, -50%) scale(0.97); }
+  }
+  @keyframes dt-pop-in {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes dt-slide-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-fade-in { animation: dt-fade-in 0.15s ease-out; }
+  .animate-fade-out { animation: dt-fade-out 0.12s ease-in; }
+
+  [data-slot='dialog-overlay'][data-state='open'] { animation: dt-fade-in 0.15s ease-out; }
+  [data-slot='dialog-overlay'][data-state='closed'] { animation: dt-fade-out 0.12s ease-in; }
+  [data-slot='dialog-content'][data-state='open'] { animation: dt-zoom-in 0.16s ease-out; }
+  [data-slot='dialog-content'][data-state='closed'] { animation: dt-zoom-out 0.12s ease-in; }
+
+  [data-radix-popper-content-wrapper] [data-state='open'] { animation: dt-pop-in 0.12s ease-out; }
+
+  .animate-slide-up { animation: dt-slide-up 0.18s ease-out; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Design token Duitrack
+   Aturan warna:
+   - teal  → brand & aksi utama
+   - green → HANYA pemasukan
+   - rose  → HANYA pengeluaran
+   - amber → peringatan budget (>= 80%)
+   - red   → budget terlampaui / aksi destruktif
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  --radius: 0.75rem;
+
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+
+  --primary: #0f766e;
+  --primary-foreground: #f0fdfa;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #1e293b;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #ccfbf1;
+  --accent-foreground: #134e4a;
+
+  --destructive: #dc2626;
+  --destructive-foreground: #fef2f2;
+
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #14b8a6;
+
+  /* semantik finansial */
+  --income: #10b981;
+  --income-soft: #d1fae5;
+  --expense: #f43f5e;
+  --expense-soft: #ffe4e6;
+  --warning: #f59e0b;
+  --warning-soft: #fef3c7;
+
+  /* chart */
+  --chart-1: #0f766e;
+  --chart-2: #14b8a6;
+  --chart-3: #f59e0b;
+  --chart-4: #8b5cf6;
+  --chart-5: #ec4899;
+}
+
+.dark {
+  --background: #0b1220;
+  --foreground: #e2e8f0;
+  --card: #111827;
+  --card-foreground: #e2e8f0;
+  --popover: #111827;
+  --popover-foreground: #e2e8f0;
+
+  --primary: #14b8a6;
+  --primary-foreground: #042f2e;
+  --secondary: #1e293b;
+  --secondary-foreground: #e2e8f0;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --accent: #134e4a;
+  --accent-foreground: #ccfbf1;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #450a0a;
+
+  --border: #1f2937;
+  --input: #1f2937;
+  --ring: #14b8a6;
+
+  --income: #34d399;
+  --income-soft: #064e3b;
+  --expense: #fb7185;
+  --expense-soft: #4c0519;
+  --warning: #fbbf24;
+  --warning-soft: #451a03;
+
+  --chart-1: #2dd4bf;
+  --chart-2: #14b8a6;
+  --chart-3: #fbbf24;
+  --chart-4: #a78bfa;
+  --chart-5: #f472b6;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-income: var(--income);
+  --color-income-soft: var(--income-soft);
+  --color-expense: var(--expense);
+  --color-expense-soft: var(--expense-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  /* Nominal uang harus rata kolom */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  /* Scrollbar halus untuk area chart & list */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 9999px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer utilities {
+  /* animasi masuk untuk sheet & toast */
+  @keyframes slide-up {
+    from {
+      transform: translateY(8px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.18s ease-out;
+  }
+}
