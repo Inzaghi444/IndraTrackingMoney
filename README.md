@@ -1,4 +1,4 @@
-# Duitrack
+# IndraTrackingMoney
 
 Aplikasi dashboard keuangan pribadi: catat pengeluaran/pemasukan harian, pantau saldo,
 lihat laporan, dan atur anggaran dengan peringatan.
