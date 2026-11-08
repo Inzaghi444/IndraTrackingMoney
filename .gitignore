@@ -53,3 +53,4 @@ src/generated/
 
 # screenshot hasil audit visual (dihasilkan ulang, bukan artefak kode)
 screenshots/
+.neon
