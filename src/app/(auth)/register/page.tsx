@@ -56,7 +56,7 @@ export default function RegisterPage() {
   return (
     <div>
       <div className="mb-7">
-        <h2 className="text-2xl font-semibold tracking-tight">Buat akun Duitrack</h2>
+        <h2 className="text-2xl font-semibold tracking-tight">Buat akun IndraTrackingMoney</h2>
         <p className="mt-1.5 text-sm text-muted-foreground">
           Sudah punya akun?{' '}
           <Link href="/login" className="font-medium text-primary hover:underline">

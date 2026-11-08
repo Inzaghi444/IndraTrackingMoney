@@ -15,7 +15,7 @@ export default async function LandingPage() {
           <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Wallet className="size-4" />
           </span>
-          <span className="text-[15px] font-semibold tracking-tight">Duitrack</span>
+          <span className="text-[15px] font-semibold tracking-tight">IndraTrackingMoney</span>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" asChild>
@@ -39,7 +39,7 @@ export default async function LandingPage() {
           </h1>
 
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Duitrack membantu kamu mencatat pengeluaran harian, memantau saldo, dan mengevaluasi
+            IndraTrackingMoney membantu kamu mencatat pengeluaran harian, memantau saldo, dan mengevaluasi
             kondisi keuangan lewat dashboard yang sederhana.
           </p>
 

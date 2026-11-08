@@ -53,7 +53,7 @@ export default function LoginPage() {
   return (
     <div>
       <div className="mb-7">
-        <h2 className="text-2xl font-semibold tracking-tight">Masuk ke Duitrack</h2>
+        <h2 className="text-2xl font-semibold tracking-tight">Masuk ke IndraTrackingMoney</h2>
         <p className="mt-1.5 text-sm text-muted-foreground">
           Belum punya akun?{' '}
           <Link href="/register" className="font-medium text-primary hover:underline">

@@ -29,10 +29,17 @@ Tunggu sampai muncul:
 [dev-db] PostgreSQL siap di localhost:55432
 ```
 
-**Terminal 2 — aplikasi:**
+**Terminal 2 — siapkan skema + jalankan aplikasi:**
 ```powershell
+npm run db:deploy   # WAJIB: buat tabel (user, session, wallets, dst.)
+npm run db:seed     # opsional tapi disarankan: 35 kategori sistem
 npm run dev
 ```
+
+> **Penting:** `npm run dev:db` hanya menyalakan PostgreSQL dan membuat database
+> kosong — **tidak** membuat tabel. Kalau `db:deploy` dilewati, login/daftar akan
+> gagal dengan error `P2021: The table public.user does not exist`.
+> `db:deploy` aman dijalankan berulang kali (idempoten).
 
 Buka http://localhost:3000
 
@@ -47,6 +54,24 @@ Kalau ingin data contoh (16 transaksi + 2 anggaran):
 # setelah register, lalu di terminal baru:
 npx tsx scripts/seed-demo.mjs
 ```
+
+## Kalau muncul "table public.user does not exist"
+
+Artinya migrasi belum jalan ke database. Perbaiki dengan:
+
+```powershell
+npm run db:deploy
+npm run db:seed
+```
+
+Cek isi database (opsional, butuh psql atau DBeaver):
+
+```sql
+select table_name from information_schema.tables where table_schema = 'public';
+```
+
+Harusnya ada 9 tabel: `user`, `session`, `account`, `verification`,
+`wallets`, `categories`, `transactions`, `budgets`, `_prisma_migrations`.
 
 ## Kalau database gagal start
 
@@ -96,3 +121,31 @@ Folder `node_modules` yang terlanjur dibuat dari WSL sebaiknya dihapus dulu:
 Remove-Item -Recurse -Force node_modules
 npm install
 ```
+
+### Jangan jalankan `next dev` / `next build` dari WSL
+
+Selain lambat, Turbopack membuat **junction** di `.next/dev/node_modules/`
+(untuk `@prisma/client` dan `pg`). Kalau dibuat dari WSL, junction-nya memakai
+format symlink Linux dan **tidak bisa dihapus oleh Windows**, sehingga build
+berikutnya gagal:
+
+```
+Error: EPERM: operation not permitted, unlink
+  ...\.next\dev\node_modules\@prisma\client-2c3a283f134fdcb6
+```
+
+Perbaikannya — hapus `.next` **dari Windows**:
+
+```powershell
+cd C:\Users\Asus\duitrack
+cmd /c rmdir /s /q .next
+npm run dev
+```
+
+> Gunakan `rmdir` (bukan `Remove-Item -Recurse`). `rmdir` hanya membuang
+> junction-nya; `Remove-Item` bisa ikut menelusuri ke dalam `node_modules`
+> dan menghapus isi paket aslinya.
+
+Tanda `.next` dibuat dari WSL: `dir /AL` menampilkan junction dengan target
+kosong (`[...]` tanpa path), bukan `[\??\C:\...]`.
+

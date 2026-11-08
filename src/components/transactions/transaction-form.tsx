@@ -298,7 +298,15 @@ export function TransactionForm({
         <Label htmlFor="note">
           Catatan <span className="font-normal text-muted-foreground">(opsional)</span>
         </Label>
-        <Input id="note" placeholder="Detail tambahan..." {...register('note')} />
+        <Input
+          id="note"
+          placeholder="Detail tambahan..."
+          aria-invalid={!!errors.note}
+          {...register('note')}
+        />
+        {errors.note && (
+          <p className="text-xs text-destructive">{errors.note.message}</p>
+        )}
       </div>
 
       <Button type="submit" size="lg" className="w-full" disabled={pending}>

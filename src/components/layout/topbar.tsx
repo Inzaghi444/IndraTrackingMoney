@@ -42,7 +42,7 @@ export function Topbar({ user }: { user: { name: string; email: string } }) {
         <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
           <Wallet className="size-4" />
         </span>
-        <span className="text-sm font-semibold tracking-tight">Duitrack</span>
+        <span className="text-sm font-semibold tracking-tight">IndraTrackingMoney</span>
       </Link>
 
       {/* Desktop: sapaan */}

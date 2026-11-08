@@ -24,13 +24,15 @@ export const createTransactionSchema = z
     occurredOn: dateString,
     description: z
       .string()
+      .trim()
       .min(1, 'Deskripsi wajib diisi')
-      .max(255, 'Deskripsi maksimal 255 karakter')
-      .transform((v) => v.trim()),
+      .max(255, 'Deskripsi maksimal 255 karakter'),
+    // `nullish` (bukan `optional`) karena form mengirim `null` untuk field
+    // opsional yang dikosongkan — hasil transformasi sisi klien.
     note: z
       .string()
       .max(1000, 'Catatan maksimal 1000 karakter')
-      .optional()
+      .nullish()
       .transform((v) => (v?.trim() ? v.trim() : null)),
   })
   .superRefine((data, ctx) => {

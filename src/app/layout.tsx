@@ -11,12 +11,12 @@ const jakarta = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Duitrack — Catat & Pantau Keuangan',
-    template: '%s · Duitrack',
+    default: 'IndraTrackingMoney — Catat & Pantau Keuangan',
+    template: '%s · IndraTrackingMoney',
   },
   description:
     'Catat pengeluaran harian, pantau saldo, dan evaluasi kondisi keuanganmu dalam satu dashboard yang sederhana.',
-  applicationName: 'Duitrack',
+  applicationName: 'IndraTrackingMoney',
 };
 
 export const viewport: Viewport = {

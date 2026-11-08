@@ -24,17 +24,18 @@ Butuh **dua terminal**.
 # terminal 1 — database (Postgres lokal, port 55432)
 npm run dev:db
 
-# terminal 2 — aplikasi
+# terminal 2 — siapkan skema lalu jalankan aplikasi
+npm run db:deploy   # WAJIB sekali di awal: buat tabel
+npm run db:seed     # seed 35 kategori sistem
 npm run dev
 ```
 
 Buka http://localhost:3000, lalu daftar akun baru.
 
-Seed kategori sistem (35 kategori) dijalankan sekali:
-
-```bash
-npm run db:seed
-```
+> `npm run dev:db` hanya menyalakan Postgres dan membuat database kosong — tabel
+> dibuat oleh `db:deploy`. Tanpa langkah itu, login/daftar gagal dengan
+> `P2021: The table public.user does not exist`. Perintah ini idempoten, aman
+> diulang setiap kali ada migrasi baru.
 
 Data demo (opsional, butuh akun yang sudah terdaftar):
 

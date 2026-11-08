@@ -17,7 +17,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <span className="flex size-9 items-center justify-center rounded-lg bg-primary-foreground/15">
             <Wallet className="size-5" />
           </span>
-          <span className="text-lg font-semibold tracking-tight">Duitrack</span>
+          <span className="text-lg font-semibold tracking-tight">IndraTrackingMoney</span>
         </Link>
 
         <div className="relative max-w-md">
@@ -59,7 +59,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Wallet className="size-5" />
             </span>
-            <span className="text-lg font-semibold tracking-tight">Duitrack</span>
+            <span className="text-lg font-semibold tracking-tight">IndraTrackingMoney</span>
           </Link>
           {children}
         </div>

@@ -30,7 +30,7 @@ export function Sidebar() {
         <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
           <Wallet className="size-4.5" />
         </span>
-        <span className="text-[15px] font-semibold tracking-tight">Duitrack</span>
+        <span className="text-[15px] font-semibold tracking-tight">IndraTrackingMoney</span>
       </div>
 
       <nav className="flex-1 space-y-1 px-3 py-2">
